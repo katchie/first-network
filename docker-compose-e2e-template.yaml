@@ -1,0 +1,90 @@
+# Copyright IBM Corp. All Rights Reserved.
+#
+# SPDX-License-Identifier: Apache-2.0
+#
+
+version: '2'
+
+volumes:
+  orderer.zonenet:
+  peer0.gtb.zonenet:
+  peer1.gtb.zonenet:
+  peer0.uba.zonenet:
+  peer1.uba.zonenet:
+
+networks:
+  byfn:
+services:
+  ca0:
+    image: hyperledger/fabric-ca:$IMAGE_TAG
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca-gtb
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+      - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.gtb.zonenet-cert.pem
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/CA1_PRIVATE_KEY
+    ports:
+      - "7054:7054"
+    command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.gtb.zonenet-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/CA1_PRIVATE_KEY -b admin:adminpw -d'
+    volumes:
+      - ./crypto-config/peerOrganizations/gtb.zonenet/ca/:/etc/hyperledger/fabric-ca-server-config
+    container_name: ca_peergtb
+    networks:
+      - byfn
+
+  ca1:
+    image: hyperledger/fabric-ca:$IMAGE_TAG
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server
+      - FABRIC_CA_SERVER_CA_NAME=ca-uba
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+      - FABRIC_CA_SERVER_TLS_CERTFILE=/etc/hyperledger/fabric-ca-server-config/ca.uba.zonenet-cert.pem
+      - FABRIC_CA_SERVER_TLS_KEYFILE=/etc/hyperledger/fabric-ca-server-config/CA2_PRIVATE_KEY
+    ports:
+      - "8054:7054"
+    command: sh -c 'fabric-ca-server start --ca.certfile /etc/hyperledger/fabric-ca-server-config/ca.uba.zonenet-cert.pem --ca.keyfile /etc/hyperledger/fabric-ca-server-config/CA2_PRIVATE_KEY -b admin:adminpw -d'
+    volumes:
+      - ./crypto-config/peerOrganizations/uba.zonenet/ca/:/etc/hyperledger/fabric-ca-server-config
+    container_name: ca_peeruba
+    networks:
+      - byfn
+
+  orderer.zonenet:
+    extends:
+      file:   base/docker-compose-base.yaml
+      service: orderer.zonenet
+    container_name: orderer.zonenet
+    networks:
+      - byfn
+
+  peer0.gtb.zonenet:
+    container_name: peer0.gtb.zonenet
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer0.gtb.zonenet
+    networks:
+      - byfn
+
+  peer1.gtb.zonenet:
+    container_name: peer1.gtb.zonenet
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer1.gtb.zonenet
+    networks:
+      - byfn
+
+  peer0.uba.zonenet:
+    container_name: peer0.uba.zonenet
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer0.uba.zonenet
+    networks:
+      - byfn
+
+  peer1.uba.zonenet:
+    container_name: peer1.uba.zonenet
+    extends:
+      file:  base/docker-compose-base.yaml
+      service: peer1.uba.zonenet
+    networks:
+      - byfn
