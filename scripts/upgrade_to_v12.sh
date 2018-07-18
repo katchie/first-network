@@ -57,20 +57,20 @@ addCapabilityToChannel() {
   # Sign, and set the correct identity for submission.
   if [ $GROUP == "application" ]; then
     # Modifying the application group requires a majority of application admins to sign.
-    # Sign with PeerOrg1.Admin
+    # Sign with Peergtb.Admin
     signConfigtxAsPeerOrg 1 config_update_in_envelope.pb
-    # Prepare to sign the update as the PeerOrg2.Admin
+    # Prepare to sign the update as the Peeruba.Admin
     setGlobals 0 2
   fi
 
   if [ -z "$CORE_PEER_TLS_ENABLED" -o "$CORE_PEER_TLS_ENABLED" = "false" ]; then
     set -x
-    peer channel update -f config_update_in_envelope.pb -c $CH_NAME -o orderer.example.com:7050 --cafile $ORDERER_CA
+    peer channel update -f config_update_in_envelope.pb -c $CH_NAME -o orderer.zonenet:7050 --cafile $ORDERER_CA
     res=$?
     set +x
   else
     set -x
-    peer channel update -f config_update_in_envelope.pb -c $CH_NAME -o orderer.example.com:7050 --tls true --cafile $ORDERER_CA
+    peer channel update -f config_update_in_envelope.pb -c $CH_NAME -o orderer.zonenet:7050 --tls true --cafile $ORDERER_CA
     res=$?
     set +x
   fi
@@ -87,28 +87,28 @@ addCapabilityToChannel "$CHANNEL_NAME" application
 
 sleep $DELAY
 
-#Query on chaincode on Peer0/Org1
-echo "Querying chaincode on org1/peer0..."
+#Query on chaincode on Peer0/gtb
+echo "Querying chaincode on gtb/peer0..."
 chaincodeQuery 0 1 90
 
-#Invoke on chaincode on Peer0/Org1
-echo "Sending invoke transaction on org1/peer0..."
+#Invoke on chaincode on Peer0/gtb
+echo "Sending invoke transaction on gtb/peer0..."
 chaincodeInvoke 0 1
 
 sleep $DELAY
 
-#Query on chaincode on Peer0/Org1
-echo "Querying chaincode on org1/peer0..."
+#Query on chaincode on Peer0/gtb
+echo "Querying chaincode on gtb/peer0..."
 chaincodeQuery 0 1 80
 
-##Invoke on chaincode on Peer0/Org2
-echo "Sending invoke transaction on org2/peer0..."
+##Invoke on chaincode on Peer0/uba
+echo "Sending invoke transaction on uba/peer0..."
 chaincodeInvoke 0 2
 
 sleep $DELAY
 
-#Query on chaincode on Peer0/Org2
-echo "Querying chaincode on org2/peer0..."
+#Query on chaincode on Peer0/uba
+echo "Querying chaincode on uba/peer0..."
 chaincodeQuery 0 2 70
 
 echo
